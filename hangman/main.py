@@ -44,15 +44,28 @@ class Hangman:
         for index in index_list:
             self._remaining_word.remove(self._word_to_guess[index])
 
-    def get_guessed_word(self, index_list, guessed_letter):
+    def modify_guessed_word(self, index_list, guessed_letter):
         for index in index_list:
             self._guessed_word[index] = guessed_letter
 
     def add_to_hangman(self):
         self._hangman_game_status.append(self._hangman.pop(0))
 
-    # gameplay functions
+    def act_for_correct_guess(self, guessed_letter):
+        index_list = self.get_letter_indices(
+                guessed_letter,
+                self._word_to_guess
+            )
+        self.modify_guessed_word(index_list, guessed_letter)
+        self.edit_remaining_word(index_list, self._remaining_word)
 
+    def act_for_wrong_guess(self):
+        self.add_to_hangman()
+        print(f"Oh no!!You got that wrong!! \
+{' '.join(self._guessed_word)}")
+        print('-'.join(self._hangman_game_status))
+
+    # gameplay functions
     def start_play(self):
         name = input("Hey there!!!! Please tell me your name: ")
         print(f"Hi {name}!!! Welcome to the amazing game of hangman!!")
@@ -84,32 +97,22 @@ def main():
 {' '.join(hangman._guessed_word)}")
 
         elif(hangman.check_input(guessed_letter, hangman._remaining_word)):
-            index_list = hangman.get_letter_indices(
-                guessed_letter,
-                hangman._word_to_guess
-            )
-            hangman.get_guessed_word(index_list, guessed_letter)
-            hangman.edit_remaining_word(index_list, hangman._remaining_word)
-            hangman.add_to_letters_already_guessed(guessed_letter)
+            hangman.act_for_correct_guess(guessed_letter)
             print(
                 f"Yay you got that right!! {' '.join(hangman._guessed_word)}"
             )
             consecutive_miss = 0
 
         else:
-            hangman.add_to_hangman()
-            print(
-                f"Oh no!!You got that wrong!! \
-{' '.join(hangman._guessed_word)}"
-            )
-            print('-'.join(hangman._hangman_game_status))
-            hangman.add_to_letters_already_guessed(guessed_letter)
+            hangman.act_for_wrong_guess()
             consecutive_miss += 1
             if consecutive_miss > 3:
                 print("C'mon! Try Harder!")
                 # Add another function to give random hints
                 print(f"The word stars with \
 {''.join(hangman._word_to_guess)[0]}")
+
+        hangman.add_to_letters_already_guessed(guessed_letter)
 
     if(''.join(hangman._guessed_word) == ''.join(hangman._word_to_guess)):
         print(
